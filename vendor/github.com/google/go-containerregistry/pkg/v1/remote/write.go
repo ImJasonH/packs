@@ -45,7 +45,7 @@ func Write(ref name.Reference, img v1.Image, auth authn.Authenticator, t http.Ro
 	scopes := []string{ref.Scope(transport.PushScope)}
 	for _, l := range ls {
 		if ml, ok := l.(*MountableLayer); ok {
-			scopes = append(scopes, ml.Repository.Scope(transport.PullScope))
+			scopes = append(scopes, ml.Reference.Context().Scope(transport.PullScope))
 		}
 	}
 
@@ -145,7 +145,9 @@ func (w *writer) initiateUpload(h v1.Hash) (location string, mounted bool, err e
 	// if "mount" is specified, even if no "from" sources are specified.  If this turns out
 	// to not be broadly applicable then we should replace mounts without "from"s with a HEAD.
 	if ml, ok := l.(*MountableLayer); ok {
-		uv["from"] = []string{ml.Repository.RepositoryStr()}
+		if w.ref.Context().RegistryStr() == ml.Reference.Context().RegistryStr() {
+			uv["from"] = []string{ml.Reference.Context().RepositoryStr()}
+		}
 	}
 	u.RawQuery = uv.Encode()
 
@@ -156,7 +158,7 @@ func (w *writer) initiateUpload(h v1.Hash) (location string, mounted bool, err e
 	}
 	defer resp.Body.Close()
 
-	if err := checkError(resp, http.StatusCreated, http.StatusAccepted); err != nil {
+	if err := CheckError(resp, http.StatusCreated, http.StatusAccepted); err != nil {
 		return "", false, err
 	}
 
@@ -199,7 +201,7 @@ func (w *writer) streamBlob(h v1.Hash, streamLocation string) (commitLocation st
 	}
 	defer resp.Body.Close()
 
-	if err := checkError(resp, http.StatusNoContent, http.StatusAccepted, http.StatusCreated); err != nil {
+	if err := CheckError(resp, http.StatusNoContent, http.StatusAccepted, http.StatusCreated); err != nil {
 		return "", err
 	}
 
@@ -229,7 +231,7 @@ func (w *writer) commitBlob(h v1.Hash, location string) (err error) {
 	}
 	defer resp.Body.Close()
 
-	return checkError(resp, http.StatusCreated)
+	return CheckError(resp, http.StatusCreated)
 }
 
 // uploadOne performs a complete upload of a single layer.
@@ -280,7 +282,7 @@ func (w *writer) commitImage() error {
 	}
 	defer resp.Body.Close()
 
-	if err := checkError(resp, http.StatusOK, http.StatusCreated, http.StatusAccepted); err != nil {
+	if err := CheckError(resp, http.StatusOK, http.StatusCreated, http.StatusAccepted); err != nil {
 		return err
 	}
 

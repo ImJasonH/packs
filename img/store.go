@@ -38,7 +38,7 @@ func (r *registryStore) Ref() name.Reference {
 }
 
 func (r *registryStore) Image() (v1.Image, error) {
-	return remote.Image(r.ref, r.auth, http.DefaultTransport)
+	return remote.Image(r.ref, remote.WithAuth(r.auth))
 }
 
 func (r *registryStore) Write(image v1.Image) error {

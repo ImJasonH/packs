@@ -183,7 +183,7 @@
     "pkg/v1/types",
     "pkg/v1/v1util"
   ]
-  revision = "11085b1805b9e9e6987278a5f61202d088e9b7f0"
+  revision = "f3fcd441e658c7ea8a08f3619170a93ef08a5be3"
 
 [[projects]]
   branch = "master"
