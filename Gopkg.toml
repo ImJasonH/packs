@@ -1,3 +1,7 @@
+required = [
+  "k8s.io/client-go/discovery",
+]
+
 [[constraint]]
   branch = "master"
   name = "code.cloudfoundry.org/buildpackapplifecycle"
@@ -13,3 +17,11 @@
 [[constraint]]
   branch = "master"
   name = "github.com/google/go-containerregistry"
+
+[[constraint]]
+  name = "k8s.io/client-go"
+  version = "kubernetes-1.10.0"
+
+[[override]]
+  name = "k8s.io/apimachinery"
+  version = "kubernetes-1.10.0"

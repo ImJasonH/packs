@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/google/go-containerregistry/pkg/authn"
+	"github.com/google/go-containerregistry/pkg/authn/k8schain"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/daemon"
@@ -21,7 +22,12 @@ func NewRegistry(ref string) (Store, error) {
 	if err != nil {
 		return nil, err
 	}
-	auth, err := authn.DefaultKeychain.Resolve(r.Context().Registry)
+	k8sc, err := k8schain.NewNoClient()
+	if err != nil {
+		return nil, err
+	}
+	kc := authn.NewMultiKeychain(authn.DefaultKeychain, k8sc)
+	auth, err := kc.Resolve(r.Context().Registry)
 	if err != nil {
 		return nil, err
 	}
