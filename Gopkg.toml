@@ -2,6 +2,10 @@ required = [
   "k8s.io/client-go/discovery",
 ]
 
+[prune]
+  unused-packages = true
+  non-go = true
+
 [[constraint]]
   branch = "master"
   name = "code.cloudfoundry.org/buildpackapplifecycle"
